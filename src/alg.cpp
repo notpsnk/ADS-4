@@ -2,9 +2,6 @@
 int countPairs1(int *arr, int len, int value) {
   int count = 0;
   for (int i = 0; i < len; ++i) {
-    if (i > 0 && arr[i] == arr[i - 1]) {
-      continue;
-    }
     for (int j = i + 1; j < len; ++j) {
       if (arr[i] + arr[j] == value) {
         ++count;
@@ -21,10 +18,24 @@ int countPairs2(int *arr, int len, int value) {
   while (left < right) {
     int s = arr[left] + arr[right];
     if (s == value) {
-      ++count;
-      int leftVal = arr[left], rightVal = arr[right];
-      while (left < right && arr[left] == leftVal) ++left;
-      while (left < right && arr[right] == rightVal) --right;
+      int l = left, r = right;
+      if (arr[left] == arr[right]) {
+        int n = right - left + 1;
+        count += n * (n - 1) / 2;
+        break;
+      }
+      int l_count = 1, r_count = 1;
+      while (left + 1 < right && arr[left] == arr[left + 1]) {
+        ++l_count;
+        ++left;
+      }
+      while (right - 1 > left && arr[right] == arr[right - 1]) {
+        ++r_count;
+        --right;
+      }
+      count += l_count * r_count;
+      ++left;
+      --right;
     } else if (s < value) {
       ++left;
     } else {
@@ -35,29 +46,31 @@ int countPairs2(int *arr, int len, int value) {
 }
 int countPairs3(int *arr, int len, int value) {
   int count = 0;
-  for (int i = 0; i < len; ++i) {
-    if (i > 0 && arr[i] == arr[i - 1]) {
-      continue;
-    }
-    int x = value - arr[i];
+  for (int i = 0; i < len - 1; ++i) {
+    int target = value - arr[i];
     int left = i + 1, right = len - 1;
-    int f = 0;
+    int low = -1, high = -1;
     while (left <= right) {
       int mid = (left + right) / 2;
-      if (arr[mid] == x) {
-        f = 1;
-        break;
-      } else if (arr[mid] < x) {
+      if (arr[mid] < target)
+        left = mid + 1;
+      else
+        right = mid - 1;
+    }
+    low = left;
+    left = i + 1;
+    right = len - 1;
+    while (left <= right) {
+      int mid = (left + right) / 2;
+      if (arr[mid] <= target) {
         left = mid + 1;
       } else {
         right = mid - 1;
       }
     }
-    if (f) {
-      if (x == arr[i]) {
-        continue;
-      }
-      count++;
+    high = right;
+    if (low <= high) {
+      count += (high - low + 1);
     }
   }
   return count;
