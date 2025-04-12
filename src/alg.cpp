@@ -54,7 +54,7 @@ int countPairs3(int *arr, int len, int value) {
       }
     }
     if (f) {
-      if (target == arr[i]) {
+      if (x == arr[i]) {
         continue;
       }
       count++;
